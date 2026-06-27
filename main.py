@@ -1,18 +1,32 @@
 import os
+import requests
 from openai import OpenAI
 
-client = OpenAI(
-    api_key=os.environ["OPENAI_API_KEY"]
-)
+client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
 
 response = client.chat.completions.create(
     model="gpt-4.1-mini",
     messages=[
         {
             "role": "user",
-            "content": "Trả lời đúng một câu: GitHub Action hoạt động!"
+            "content": "Viết một câu chào ngắn gửi Telegram."
         }
     ]
 )
 
-print(response.choices[0].message.content)
+message = response.choices[0].message.content
+
+bot_token = os.environ["TELEGRAM_BOT_TOKEN"]
+chat_id = os.environ["TELEGRAM_CHAT_ID"]
+
+url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
+
+requests.post(
+    url,
+    data={
+        "chat_id": chat_id,
+        "text": message
+    }
+)
+
+print("Đã gửi Telegram.")
